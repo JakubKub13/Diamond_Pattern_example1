@@ -33,6 +33,9 @@ library LibDiamond {
         address contractOwner;
     }
 
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event DiamondCut(IDiamondCut.FacetCut[] _diamondCut, address _init, bytes _calldata);
+
     function diamondStorage() internal pure returns (DiamondStorage storage ds) {
         bytes32 position = DIAMOND_STORAGE_POSITION;
         assembly {
@@ -40,5 +43,5 @@ library LibDiamond {
         }
     }
 
-    
+
 }
