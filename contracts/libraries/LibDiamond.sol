@@ -79,5 +79,23 @@ library LibDiamond {
         initializeDiamondCut(_init, _calldata);
     }
 
+    function addFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {
+        require(_functionSelectors.length > 0, "LibDiamondCut: No selectors in facet to cut");
+        DiamondStorage storage ds = diamondStorage();
+        require(_facetAddress != address(0), "LibDiamondCut: Can not be address 0");
+        uint96 selectorPosition = uint96(ds.facetFunctionSelectors[_facetAddress].functionSelectors.length);
+        // add new facet address if it does not exist
+        if (selectorPosition == 0) {
+            addFacet(ds, _facetAddress);
+        }
+        for (uint256 selectorIndex; selectorIndex < _functionSelectors.length; selectorIndex++) {
+            bytes4 selector = _functionSelectors[selectorIndex];
+            address oldFacetAddress = ds.selectorToFacetAndPosition[selector].facetAddress;
+            require(oldFacetAddress == address(0), "LibDiamondCut: Can not add function that already exists");
+            addFuntion(ds, selector, selectorPosition, _facetAddress);
+            selectorPosition++;
+        }
+    }
+
 
 }
