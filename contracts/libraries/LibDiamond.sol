@@ -43,5 +43,41 @@ library LibDiamond {
         }
     }
 
+    function setContractOwner(address _newOwner) internal {
+        DiamondStorage storage ds = diamondStorage();
+        address previousOwner = ds.contractOwner();
+        ds.contractOwner = _newOwner;
+        emit OwnershipTransferred(previousOwner, _newOwner);
+    }
+
+    function contractOwner() internal view returns (address contractOwner_) {
+        contractOwner_ = diamondStorage().contractOwner;
+    }
+
+    function enforeIsContractOwner() internal view {
+        require(msg.sender == diamondStorage().contractOwner, "LibDiamond: Is not contract owner");
+    }
+
+    function diamondCut(
+        IDiamondCut.FacetCut[] memory _diamondCut,
+        address _init,
+        bytes memory _calldata
+    ) internal {
+        for (uint256 facetIndex; facetIndex < _diamondCut.length; facetIndex++) {
+            IDiamondCut.FacetCutAction action = _diamondCut[facetIndex].action;
+            if (action == IDiamondCut.FacetCutAction.Add) {
+                addFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].functionSelectors);
+            } else if (action == IDiamondCut.FacetCutAction.Replace) {
+                replaceFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].functionSelectors);
+            } else if (action == IDiamondCut.FacetCutAction.Remove) {
+                removeFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].functionSelectors);
+            } else {
+                revert("LibDiamondCut: Incorrect FacetCutAction");
+            }
+        }
+        emit DiamondCut(_diamondCut, _init, _calldata);
+        initializeDiamondCut(_init, _calldata);
+    }
+
 
 }
