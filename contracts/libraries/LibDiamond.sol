@@ -128,5 +128,11 @@ library LibDiamond {
         }
     }
 
+    function addFacet(DiamondStorage storage ds, address _facetAddress) internal {
+        enforceHasContractCode(_facetAddress, "LibDiamondCut: New facet has no code");
+        ds.facetFunctionSelectors[_facetAddress].facetAddressPosition = ds.facetAddresses.length;
+        ds.facetAddresses.push(_facetAddress);
+    }
+
 
 }
