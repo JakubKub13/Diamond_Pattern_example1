@@ -154,7 +154,25 @@ library LibDiamond {
             ds.selectorToFacetAndPosition[lastSelector].functionSelectorPosition = uint96(selectorPosition);
         }
         //delete the last selector
+        ds.facetFunctionSelectors[_facetAddress].functionSelectors.pop();
+        delete ds.selectorToFacetAndPosition[_selector];
+
+        // If no more selectors for facet address then delete the facet address
+        if (lastSelectorPosition == 0) {
+            // replace facet address with last facet address and delete last facet address
+            uint256 lastFacetAddressPosition = ds.facetAddresses.length - 1;
+            uint256 facetAddressPosition = ds.facetFunctionSelectors[_facetAddress].facetAddressPosition;
+            if (facetAddressPosition != lastFacetAddressPosition) {
+                address lastFacetAddress = ds.facetAddresses[lastFacetAddressPosition];
+                ds.facetAddresses[facetAddressPosition] = lastFacetAddress;
+                ds.facetFunctionSelectors[lastFacetAddress].facetAddressPosition = facetAddressPosition;
+            }
+            ds.facetAddresses.pop();
+            delete ds.facetFunctionSelectors[_facetAddress].facetAddressPosition;
+        }
     }
+
+    
 
 
 
