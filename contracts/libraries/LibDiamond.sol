@@ -172,7 +172,27 @@ library LibDiamond {
         }
     }
 
+    function initializeDiamondCut(address _init, bytes memory _calldata) internal {
+        if (_init == address(0)) {
+            return;
+        }
+        enforceHasContractCode(_init, "LibDiamondCut: _init address has no code");
+        (bool success, bytes memory error) = _init.delegatecall(_calldata);
+        if (!success) {
+            if (error.length > 0) {
+                assembly {
+                    let returndata_size := mload(error)
+                    revert(add(32, error), returndata_size)
+                }
+            } else {
+                revert InitializationFunctionReverted(_init, _calldata);
+            }
+        }
+    }
+
     
+
+
 
 
 
