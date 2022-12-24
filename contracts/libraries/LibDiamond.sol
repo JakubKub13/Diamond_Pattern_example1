@@ -190,11 +190,11 @@ library LibDiamond {
         }
     }
 
-    
-
-
-
-
-
-
+    function enforceHasContractCode(address _contract, string memory _errorMessage) internal view {
+        uint256 contractSize;
+        assembly {
+            contractSize := extcodesize(_contract)
+        }
+        require(contractSize > 0, _errorMessage);
+    }
 }
