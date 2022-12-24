@@ -116,5 +116,17 @@ library LibDiamond {
         }
     }
 
+    function removeFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {
+        require(_functionSelectors.length > 0, "LibDiamondCut: No selectors in facet to cut");
+        DiamondStorage storage ds = diamondStorage();
+        // If function does not exist than do nothing and return
+        require(_facetAddress == address(0), "LibDiamondCut: Remove facet address must be address(0)");
+        for(uint256 selectorIndex; selectorIndex < _functionSelectors.length; selectorIndex++) {
+            bytes4 selector = _functionSelectors[selectorIndex];
+            address oldFacetAddress = ds.selectorToFacetAndPosition[selector].facetAddress;
+            removeFunction(ds, oldFacetAddress, selector);
+        }
+    }
+
 
 }
