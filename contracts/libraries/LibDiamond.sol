@@ -145,7 +145,15 @@ library LibDiamond {
         // an immutable function is a function defined directly in a diamond
         require(_facetAddress != address(this), "LibDiamondCut: Can not remove immutable function");
         // replace selector with last selector than delete last selector
-        uint256 selectorPosition
+        uint256 selectorPosition = ds.selectorToFacetAndPosition[_selector].functionSelectorPosition;
+        uint256 lastSelectorPosition = ds.facetFunctionSelectors[_facetAddress].functionSelectors.length - 1;
+        // if not the same then replace _selector with lastSelector
+        if (selectorPosition != lastSelectorPosition) {
+            bytes4 lastSelector = ds.facetFunctionSelectors[_facetAddress].functionSelectors[lastSelectorPosition];
+            ds.facetFunctionSelectors[_facetAddress].functionSelectors[selectorPosition] = lastSelector;
+            ds.selectorToFacetAndPosition[lastSelector].functionSelectorPosition = uint96(selectorPosition);
+        }
+        //delete the last selector
     }
 
 
