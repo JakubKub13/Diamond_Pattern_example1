@@ -20,4 +20,18 @@ contract Diamond {
         });
         LibDiamond.diamondCut(cut, address(0), "");
     }
+
+    fallback() external payable {
+        LibDiamond.DiamondStorage storage ds;
+        bytes32 position = LibDiamond.DIAMOND_STORAGE_POSITION;
+        // get the diamond storage
+        assembly {
+            ds.slot := position
+        }
+        // get facet from function selector
+        address facet = ds.selectorToFacetAndPosition[msg.sig].facetAddress;
+        require(facet != address(0), "Diamond: Function does not exist");
+        // execute external function from facet using delegatecall and return any value.
+        
+    }
 }
